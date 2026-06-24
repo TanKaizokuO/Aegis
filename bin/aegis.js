@@ -29,3 +29,22 @@ if (args.version) {
   console.log(pkg.version);
   process.exit(0);
 }
+
+if (args.help) {
+  console.log(`
+Usage: aegis [options] [globs...]
+
+Options:
+  -v, --version         Output the version number
+  -h, --help            Output usage information
+  --stdin               Read from standard input
+  -t, --text            Force parsing as plain text
+  --html                Force parsing as HTML
+  --mdx                 Force parsing as MDX
+  --diff                (Not yet implemented) output diff
+  -r, --reporter <name> Format output using a reporter
+  -q, --quiet           Do not output anything for clean files
+  --why                 Append rule source to warnings
+  `);
+  process.exit(0);
+}
