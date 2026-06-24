@@ -143,3 +143,32 @@ if (args.stdin) {
     allResults.push(vf);
   }
 }
+
+// Reporting and exit
+async function runReporter() {
+  let reporterFn;
+  
+  if (args.reporter) {
+    try {
+      const reporterModule = await import(args.reporter);
+      reporterFn = reporterModule.default || reporterModule;
+    } catch (e) {
+      console.error(`Could not find reporter '${args.reporter}'`);
+      process.exit(0);
+    }
+  } else {
+    const reporterModule = await import('../src/cli/reporter.js');
+    reporterFn = reporterModule.default;
+  }
+
+  reporterFn(allResults, { quiet: args.quiet, why: args.why });
+
+  const totalWarnings = allResults.reduce((acc, f) => acc + (f.Messages ? f.Messages.length : 0), 0);
+  if (totalWarnings > 0) {
+    process.exit(1);
+  } else {
+    process.exit(0);
+  }
+}
+
+runReporter();
