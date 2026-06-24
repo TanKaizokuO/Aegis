@@ -55,3 +55,17 @@ if (args.stdin && globs.length > 0) {
   console.error("Do not pass globs with `--stdin`");
   process.exit(1);
 }
+
+import fg from 'fast-glob';
+
+let filesToProcess = [];
+
+if (!args.stdin) {
+  const searchGlobs = globs.length > 0 ? globs : [
+    '*.{md,mdx,html,txt}',
+    'doc/**/*.{md,mdx,html,txt}',
+    'docs/**/*.{md,mdx,html,txt}'
+  ];
+  
+  filesToProcess = fg.sync(searchGlobs, { absolute: true });
+}
