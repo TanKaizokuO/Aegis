@@ -105,6 +105,12 @@ import { AnalyzeMarkdown, AnalyzeMDX, AnalyzeHTML, AnalyzePlainText } from '../i
 const explorer = cosmiconfigSync('aegis');
 const allResults = [];
 
+/**
+ * Determines the correct analyzer based on CLI flags and file extension.
+ * @param {string|null} filepath - The file path (null for stdin)
+ * @param {Object} cliArgs - The parsed CLI arguments
+ * @returns {Function} The appropriate analyzer function
+ */
 function getAnalyzer(filepath, cliArgs) {
   if (cliArgs.mdx) return AnalyzeMDX;
   if (cliArgs.html) return AnalyzeHTML;
