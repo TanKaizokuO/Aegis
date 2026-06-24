@@ -12,6 +12,10 @@
   "type": "module",
   "dependencies": {
     "acorn": "^8.17.0",
+    "cosmiconfig": "^9.0.2",
+    "fast-glob": "^3.3.3",
+    "ignore": "^7.0.5",
+    "mri": "^1.2.0",
     "rehype-parse": "^9.0.1",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
