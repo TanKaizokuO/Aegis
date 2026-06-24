@@ -57,6 +57,21 @@ if (args.stdin && globs.length > 0) {
 }
 
 import fg from 'fast-glob';
+import ignore from 'ignore';
+import fs from 'node:fs';
+import { relative } from 'node:path';
+
+const ig = ignore().add('node_modules');
+
+let currentDir = process.cwd();
+while (currentDir !== dirname(currentDir)) {
+  const ignorePath = join(currentDir, '.aegisignore');
+  if (fs.existsSync(ignorePath)) {
+    ig.add(fs.readFileSync(ignorePath, 'utf8'));
+    break;
+  }
+  currentDir = dirname(currentDir);
+}
 
 let filesToProcess = [];
 
@@ -67,5 +82,14 @@ if (!args.stdin) {
     'docs/**/*.{md,mdx,html,txt}'
   ];
   
-  filesToProcess = fg.sync(searchGlobs, { absolute: true });
+  const validExtensions = new Set(['.md', '.mdx', '.html', '.txt']);
+  const allFiles = fg.sync(searchGlobs, { absolute: true });
+  filesToProcess = allFiles.filter(f => {
+    if (!ig.ignores(relative(process.cwd(), f))) {
+      // Check extension
+      const ext = f.slice(f.lastIndexOf('.')).toLowerCase();
+      return validExtensions.has(ext);
+    }
+    return false;
+  });
 }
