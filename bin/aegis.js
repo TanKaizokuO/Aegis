@@ -93,3 +93,48 @@ if (!args.stdin) {
     return false;
   });
 }
+
+import { cosmiconfigSync } from 'cosmiconfig';
+import { AnalyzeMarkdown, AnalyzeMDX, AnalyzeHTML, AnalyzePlainText } from '../index.js';
+
+const explorer = cosmiconfigSync('aegis');
+const allResults = [];
+
+function getAnalyzer(filepath, cliArgs) {
+  if (cliArgs.mdx) return AnalyzeMDX;
+  if (cliArgs.html) return AnalyzeHTML;
+  if (cliArgs.text) return AnalyzePlainText;
+  
+  if (filepath) {
+    const ext = filepath.slice(filepath.lastIndexOf('.')).toLowerCase();
+    if (ext === '.mdx') return AnalyzeMDX;
+    if (ext === '.html') return AnalyzeHTML;
+    if (ext === '.txt') return AnalyzePlainText;
+  }
+  return AnalyzeMarkdown; // Default for .md and stdin
+}
+
+if (args.stdin) {
+  const stdinBuffer = fs.readFileSync(0, 'utf-8');
+  if (stdinBuffer.trim().length > 0) {
+    const analyzer = getAnalyzer(null, args);
+    const result = explorer.search(process.cwd());
+    const config = result ? result.config : undefined;
+    const vf = analyzer(stdinBuffer, config);
+    vf.path = 'stdin';
+    allResults.push(vf);
+  } else {
+    const vf = { path: 'stdin', Messages: [] };
+    allResults.push(vf);
+  }
+} else {
+  for (const file of filesToProcess) {
+    const content = fs.readFileSync(file, 'utf-8');
+    const analyzer = getAnalyzer(file, args);
+    const result = explorer.search(dirname(file));
+    const config = result ? result.config : undefined;
+    const vf = analyzer(content, config);
+    vf.path = relative(process.cwd(), file);
+    allResults.push(vf);
+  }
+}
