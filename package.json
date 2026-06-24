@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "aegis": "./bin/aegis.js"
+  },
   "scripts": {
     "test": "node --test test/*.test.js"
   },
