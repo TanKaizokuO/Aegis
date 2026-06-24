@@ -144,6 +144,9 @@ if (args.stdin) {
   }
 }
 
+import { checkVersion } from '../src/cli/version-check.js';
+const versionPromise = checkVersion();
+
 // Reporting and exit
 async function runReporter() {
   let reporterFn;
@@ -162,6 +165,11 @@ async function runReporter() {
   }
 
   reporterFn(allResults, { quiet: args.quiet, why: args.why });
+
+  const updateMessage = await versionPromise;
+  if (updateMessage) {
+    process.stderr.write(updateMessage);
+  }
 
   const totalWarnings = allResults.reduce((acc, f) => acc + (f.Messages ? f.Messages.length : 0), 0);
   if (totalWarnings > 0) {
