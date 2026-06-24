@@ -11,14 +11,14 @@ const cliPath = join(__dirname, '..', 'bin', 'aegis.js');
 
 function runCli(args, options = {}) {
   try {
-    const stdout = execSync(`node ${cliPath} ${args}`, {
+    const stdout = execSync(`node ${cliPath} ${args} 2>&1`, {
       ...options,
       encoding: 'utf8',
       stdio: 'pipe'
     });
-    return { stdout, stderr: '', status: 0 };
+    return { stdout, stderr: stdout, status: 0 };
   } catch (error) {
-    return { stdout: error.stdout || '', stderr: error.stderr || '', status: error.status };
+    return { stdout: error.stdout || '', stderr: error.stdout || '', status: error.status };
   }
 }
 
@@ -79,5 +79,74 @@ test('Phase 3 CLI: File Discovery & Ignore Logic', async (t) => {
     // No recognized files = 0 warnings
     assert.strictEqual(status, 0);
     assert.ok(!stderr.includes('unrecognized.csv'));
+  });
+});
+
+test('Phase 3 CLI: Stdin & Format Fallbacks', async (t) => {
+  await t.test('Stdin processes input and defaults to Markdown', () => {
+    try {
+      execSync(`echo "He is going to the master branch." | node ${cliPath} --stdin`, { encoding: 'utf8', stdio: 'pipe' });
+      assert.fail('Should exit 1');
+    } catch (error) {
+      assert.strictEqual(error.status, 1);
+      assert.ok(error.stderr.includes('stdin'));
+      assert.ok(error.stderr.includes('warning  `He` may be insensitive'));
+      assert.ok(error.stderr.includes('warning  `master` may be insensitive'));
+    }
+  });
+
+  await t.test('Stdin format override works', () => {
+    // In plain text, embedded comments are not parsed as directives
+    try {
+      execSync(`echo "<!--aegis ignore he-she-->\nHe is going." | node ${cliPath} --stdin --text`, { encoding: 'utf8', stdio: 'pipe' });
+      assert.fail('Should exit 1');
+    } catch (error) {
+      assert.strictEqual(error.status, 1);
+      // In text mode, "he", "she", and "He" are all caught
+      assert.ok(error.stderr.includes('3 warning(s)'));
+    }
+  });
+
+  await t.test('Stdin glob conflict validation', () => {
+    try {
+      execSync(`node ${cliPath} --stdin someglob`, { encoding: 'utf8', stdio: 'pipe' });
+      assert.fail('Should exit 1');
+    } catch (error) {
+      assert.strictEqual(error.status, 1);
+      assert.ok(error.stderr.includes('Do not pass globs with `--stdin`'));
+    }
+  });
+});
+
+test('Phase 3 CLI: Reporters, Quiet, and Exit Codes', async (t) => {
+  await t.test('--quiet suppresses output for clean files', () => {
+    try {
+      execSync(`echo "Clean text here." | node ${cliPath} --stdin --quiet`, { encoding: 'utf8', stdio: 'pipe' });
+      // Should not throw, exit 0
+    } catch (error) {
+      assert.fail('Should exit 0');
+    }
+  });
+
+  await t.test('Missing reporter outputs message and exits 0', () => {
+    const { stderr, status } = runCli('--reporter=nonexistent-reporter');
+    assert.strictEqual(status, 0);
+    assert.ok(stderr.includes("Could not find reporter 'nonexistent-reporter'"));
+  });
+
+  await t.test('--why appends source engine to warnings', () => {
+    try {
+      execSync(`echo "He is going." | node ${cliPath} --stdin --why`, { encoding: 'utf8', stdio: 'pipe' });
+      assert.fail('Should exit 1');
+    } catch (error) {
+      assert.strictEqual(error.status, 1);
+      assert.ok(error.stderr.includes('(EqualityAnalyzer)'));
+    }
+  });
+
+  await t.test('--diff outputs unimplemented stub and exits 0', () => {
+    const { stderr, status } = runCli('--diff');
+    assert.strictEqual(status, 0);
+    assert.ok(stderr.includes("[--diff not yet implemented]"));
   });
 });
