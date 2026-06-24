@@ -154,6 +154,9 @@ import { checkVersion } from '../src/cli/version-check.js';
 const versionPromise = checkVersion();
 
 // Reporting and exit
+/**
+ * Executes the selected reporter and terminates the process with the appropriate exit code.
+ */
 async function runReporter() {
   let reporterFn;
   
