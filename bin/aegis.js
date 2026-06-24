@@ -49,6 +49,11 @@ Options:
   process.exit(0);
 }
 
+if (args.diff) {
+  console.error('[--diff not yet implemented]');
+  process.exit(0);
+}
+
 const globs = args._;
 
 if (args.stdin && globs.length > 0) {
