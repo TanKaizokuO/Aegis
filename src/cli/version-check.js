@@ -2,6 +2,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+/**
+ * Fetches the latest package version and compares it with the current.
+ * Designed to be non-blocking with a short 1s timeout.
+ * @returns {Promise<string|null>} The update message if available, or null.
+ */
 export async function checkVersion() {
   try {
     const __filename = fileURLToPath(import.meta.url);
