@@ -48,3 +48,10 @@ Options:
   `);
   process.exit(0);
 }
+
+const globs = args._;
+
+if (args.stdin && globs.length > 0) {
+  console.error("Do not pass globs with `--stdin`");
+  process.exit(1);
+}
