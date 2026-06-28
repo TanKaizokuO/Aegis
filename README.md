@@ -1,93 +1,126 @@
-# Aegis Linter
+<div align="center">
 
-A fast, stateless, Alex-compatible Markdown, MDX, HTML, and Plain Text linter designed to enforce inclusive language with no false positives across block boundaries.
+# Aegis
 
-## Features
-- **Multi-Format Support**: Natively parses Markdown, MDX, HTML, and Plain Text.
-- **Smart Ignore Directives**: Supports in-document ignore comments (e.g. `<!--aegis ignore-->`, `<!--aegis disable-->`, `<!--aegis enable-->`).
-- **Fast Execution**: Implements explicit glob expansion and intelligent auto-discovery to prevent runaway recursive searches.
-- **Standard Input (`stdin`)**: Read and format piped text natively.
-- **Configuration**: Fully configurable via `.aegisrc` using `cosmiconfig`.
-- **Non-blocking Version Checks**: Checks for updates gracefully without slowing down CI pipelines or local workflows.
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
+[![License](https://img.shields.io/badge/license-ISC-blue)](#)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue)](#)
 
-## Installation
+**Aegis is an Inclusive Language Linter that analyzes written documents (Markdown, MDX, HTML, Plain Text) to detect insensitive, biased, or profane language and suggests neutral alternatives.**
 
-Install globally using `npm`:
+</div>
 
+---
+
+## 📑 Table of Contents
+- [About the Project](#about-the-project)
+- [Key Features](#key-features)
+- [Built With](#built-with)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+---
+
+## 📖 About the Project
+
+Aegis is a modern, extensible linter built specifically to foster inclusive writing and documentation. Whether you are writing READMEs, technical documentation, or blog posts, Aegis helps maintain a welcoming tone by scanning your text for non-inclusive, biased, or profane terms. Utilizing a robust AST-based approach, it completely ignores code blocks, attributes, and scripts to focus strictly on human-readable prose, providing helpful suggestions without false positives on technical syntax.
+
+---
+
+## ✨ Key Features
+
+- **Multi-Format Support:** Analyzes Markdown, MDX, HTML, and Plain Text out of the box.
+- **Smart Prose Extraction:** Uses AST traversal to parse only human-readable text, safely ignoring code snippets and raw syntax.
+- **Equality & Profanity Analysis:** Detects biased/unequal phrasing and checks against a rated profanity dictionary with neutral alternatives suggested.
+- **Highly Configurable:** Supports in-document directives (e.g., `<!--aegis ignore-->`) and standard configuration files (like `.aegisrc` or `package.json`).
+
+---
+
+## 🛠 Built With
+
+This project leverages the following technologies:
+
+- **[Node.js](https://nodejs.org/)** (v18+)
+- **[Unified Ecosystem](https://unifiedjs.com/)** (`remark`, `rehype`)
+- **[Acorn](https://github.com/acornjs/acorn)**
+- **[Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig)**
+
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+You will need the following tools installed on your system:
+
+- **Node.js v18 or higher** (Required for the native `node --test` runner)
+- **npm** (Node Package Manager)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/[your-username]/aegis.git
+   ```
+
+2. **Navigate to the project directory:**
+   ```bash
+   cd aegis
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+---
+
+## 💡 Usage
+
+You can run Aegis programmatically or via the command-line interface. 
+
+### Command Line Interface (CLI)
+
+Run Aegis against a glob of files:
 ```bash
-npm install -g aegis-linter-core
+node ./bin/aegis.js "docs/**/*.md"
 ```
 
-Or install as a devDependency in your project:
+*Note: You can link the package globally using `npm link` to simply run `aegis "docs/**/*.md"`.*
 
-```bash
-npm install --save-dev aegis-linter-core
-```
+### Configuration
 
-## Usage
+Configuration is automatically loaded via `cosmiconfig`. Create a `.aegisrc.yml`, `.aegisrc.json`, or an `aegis` field in your `package.json` to customize rules, allowlists, or denylists.
 
-```bash
-Usage: aegis [options] [globs...]
+---
 
-Options:
-  -v, --version         Output the version number
-  -h, --help            Output usage information
-  --stdin               Read from standard input
-  -t, --text            Force parsing as plain text
-  --html                Force parsing as HTML
-  --mdx                 Force parsing as MDX
-  --diff                (Not yet implemented) output diff
-  -r, --reporter <name> Format output using a reporter
-  -q, --quiet           Do not output anything for clean files
-  --why                 Append rule source to warnings
-```
+## 🤝 Contributing
 
-### Examples
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Lint all `.md`, `.mdx`, `.html`, and `.txt` files in the current directory and `doc/` folders (auto-discovery):
-```bash
-aegis
-```
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-Lint specific files:
-```bash
-aegis README.md "docs/**/*.md"
-```
+---
 
-Read from standard input:
-```bash
-echo "master branch" | aegis --stdin
-```
+## 📄 License
 
-## Configuration
+Distributed under the **ISC** License. See `LICENSE` for more information.
 
-Aegis can be configured via a `.aegisrc` file (JSON or YAML) or an `"aegis"` key in your `package.json`.
+---
 
-```json
-{
-  "allow": [
-    "master",
-    "slave"
-  ]
-}
-```
+## 📬 Contact
 
-## Directives
+**[Your Name]** - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
 
-You can disable or enable rules within your markdown, MDX, or HTML files using HTML comments:
-
-```html
-<!-- aegis disable he-she -->
-He is going to the store.
-<!-- aegis enable he-she -->
-```
-
-Or ignore the next block:
-```html
-<!-- aegis ignore he-she -->
-He is going to the store.
-```
-
-## License
-
-This project is licensed under the [Apache License 2.0](LICENSE).
+Project Link: [https://github.com/[your-username]/aegis](https://github.com/[your-username]/aegis)
